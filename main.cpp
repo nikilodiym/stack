@@ -4,8 +4,9 @@
 
 using namespace std;
 
-int stack_principle(const string& str) {
+int stack_principle(const string& str, string& fixedStr) {
     stack<int> parenthesesStack;
+    fixedStr = str;
 
     for (int i = 0; i < str.length(); i++) {
         if (str[i] == '(' || str[i] == '[' || str[i] == '{') {
@@ -13,7 +14,8 @@ int stack_principle(const string& str) {
         }
         else if (str[i] == ')' || str[i] == ']' || str[i] == '}') {
             if (parenthesesStack.empty()) {
-                return false;
+                fixedStr.insert(i, "(");
+                return i;
             }
 
             int topIndex = parenthesesStack.top();
@@ -22,30 +24,46 @@ int stack_principle(const string& str) {
             if ((str[i] == ')' && str[topIndex] != '(') ||
                 (str[i] == ']' && str[topIndex] != '[') ||
                 (str[i] == '}' && str[topIndex] != '{')) {
-                return false;
+                fixedStr.insert(i, string(1, str[topIndex]));
+                return i;
             }
         }
     }
 
-    return parenthesesStack.empty();
+    while (!parenthesesStack.empty()) {
+        int openIndex = parenthesesStack.top();
+        parenthesesStack.pop();
+
+        if (str[openIndex] == '(') {
+            fixedStr += ')';
+        }
+        else if (str[openIndex] == '[') {
+            fixedStr += ']';
+        }
+        else if (str[openIndex] == '{') {
+            fixedStr += '}';
+        }
+    }
+
+    return -1;
 }
 
 int main() {
-
     string str;
     cout << "Enter a str: ";
     getline(cin, str);
 
+    string fixedStr;
+    int result = stack_principle(str, fixedStr);
 
-    if (stack_principle(str)) {
+    if (result == -1) {
         cout << "correct" << endl;
     }
     else {
-        cout << "incorrect" << endl;
+        cout << "incorrect at index: " << result << endl;
+        cout << "correct format: " << fixedStr << endl;
     }
-
-    cout << int{'{'}; // index check
 
     system("pause");
     return 0;
-};
+}
